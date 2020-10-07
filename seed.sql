@@ -5,13 +5,13 @@ CREATE DATABASE trackerDB;
 USE trackerDB;
 
 CREATE TABLE department(
-    id INT NOT NULL AUTO_INCREMENT,
-    name VARCHAR(30) NULL,
+    id INT unique,
+    department_name VARCHAR(30) NULL,
     PRIMARY KEY (id)
 );
 
 CREATE TABLE role(
-    id INT NOT NULL AUTO_INCREMENT,
+    id INT unique,
     title VARCHAR(30) NULL,
     salary DECIMAL(10,4) NULL,
     department_id INT NULL,
@@ -19,7 +19,7 @@ CREATE TABLE role(
     
 );
 CREATE TABLE employee(
-    id INT NOT NULL AUTO_INCREMENT,
+    id INT unique,
     first_name VARCHAR(30) NULL,
     last_name VARCHAR(30) NULL,
     role_id INT NULL,
@@ -27,3 +27,9 @@ CREATE TABLE employee(
     PRIMARY KEY (id)
 
 )
+
+select * from department;
+
+select * from role;
+
+select * from employee;

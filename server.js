@@ -12,12 +12,13 @@ var connection = mysql.createConnection({
   user: "root",
 
   // Your password
-  password: "",
+  password: "Spring22!",
   database: "trackerDB"
 });
 
 connection.connect(function(err) {
   if (err) throw err;
+  console.log("connected as id " + connection.threadId + "\n");
   runTracker();
 });
 
@@ -72,7 +73,7 @@ function runTracker() {
       inquirer
       .prompt([
           {
-              name: 'name',
+              name: 'department_name',
               type: 'input',
               message: 'Please enter department name:'
           },
@@ -84,10 +85,10 @@ function runTracker() {
       ])
       .then(function(answer){
           connection.query(
-              'INSERT INTO role SET ?',
+              'INSERT INTO department SET ?',
               {
-                  name: answer.name,
-                  id: answer.id
+                department_name: answer.department_name,
+                id: answer.id
               },
               function (err){
                   if(err) throw err;
@@ -123,7 +124,7 @@ function runTracker() {
     ])
     .then(function(answer){
         connection.query(
-            'INSERT INTO department SET ?',
+            'INSERT INTO role SET ?',
             {
                 title: answer.title,
                 id: answer.id,
@@ -178,4 +179,69 @@ function addEmployee(){
             }
         );
     });
+}
+function viewDepartments() {
+    console.log("Selecting all departments...\n");
+    connection.query("SELECT * FROM department", function(err, res) {
+      if (err) throw err;
+      // Log all results of the SELECT statement
+      console.log(res);
+      runTracker();
+    });
+}
+function viewRoles() {
+    console.log("Selecting all roles...\n");
+    connection.query("SELECT * FROM role", function(err, res) {
+      if (err) throw err;
+      // Log all results of the SELECT statement
+      console.log(res);
+      runTracker();
+    });
+}
+function viewEmployees() {
+    console.log("Selecting all employee...\n");
+    connection.query("SELECT * FROM employee", function(err, res) {
+      if (err) throw err;
+      // Log all results of the SELECT statement
+      console.log(res);
+      runTracker();
+    });
+}
+function updateEmployees() {
+    console.log("Updating employee role...\n");
+    inquirer
+    .prompt([
+    {
+        name: 'id',
+        type: 'input',
+        message: 'Please enter the employee id you would like to update:'
+    },
+    {
+        name: 'role_id',
+        type: 'input',
+        message: 'Please enter new role id:'
+    }
+    ])
+    .then(function(answer){
+    var query = connection.query(
+      "UPDATE employee SET ? WHERE ?",
+      [
+        {
+          id: answer.id,
+        },
+        {
+          role_id: answer.role_id
+        }
+      ],
+      function(err, res) {
+        if (err) throw err;
+        console.log(res.affectedRows + " products updated!\n");
+        // Call deleteProduct AFTER the UPDATE completes
+        runTracker();
+      }
+    );
+  
+    // logs the actual query being run
+    console.log(query.sql);
+  });
 }
