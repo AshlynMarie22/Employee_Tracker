@@ -1,6 +1,6 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
-const { type } = require("os");
+// const { type } = require("os");
 const cTable = require("console.table");
 
 var connection = mysql.createConnection({
@@ -29,15 +29,39 @@ function runTracker() {
       name: "action",
       type: "rawlist",
       message: "What would you like to do?",
-      choices: [
-        "Add department",
-        "Add role",
-        "Add employee",
-        "View departments",
-        "View roles",
-        "View employees",
-        "Update employee role",
-      ],
+      choices: ["Add", "View", "Update", "Delete", "Exit"],
+    })
+    .then(function (answer) {
+      switch (answer.action) {
+        case "Add":
+          addRunTracker();
+          break;
+
+        case "View":
+          viewRunTracker();
+          break;
+
+        case "Update":
+          updateRunTracker();
+          break;
+
+        case "Delete":
+          deleteRunTracker();
+          break;
+
+        case "Exit":
+          connection.end();
+          break;
+      }
+    });
+}
+function addRunTracker() {
+  inquirer
+    .prompt({
+      name: "action",
+      type: "rawlist",
+      message: "What would you like to do?",
+      choices: ["Add department", "Add role", "Add employee", "Exit"],
     })
     .then(function (answer) {
       switch (answer.action) {
@@ -53,6 +77,29 @@ function runTracker() {
           addEmployee();
           break;
 
+        case "Exit":
+          runTracker();
+          break;
+      }
+    });
+}
+
+function viewRunTracker() {
+  inquirer
+    .prompt({
+      name: "action",
+      type: "rawlist",
+      message: "What would you like to do?",
+      choices: [
+        "View departments",
+        "View roles",
+        "View employees",
+        "View employees by Manager",
+        "Exit",
+      ],
+    })
+    .then(function (answer) {
+      switch (answer.action) {
         case "View departments":
           viewDepartments();
           break;
@@ -64,12 +111,69 @@ function runTracker() {
         case "View employees":
           viewEmployees();
           break;
-        case "Update employee role":
-          updateEmployees();
+
+        case "View employees by Manager":
+          viewEmployeesManager();
+          break;
+
+        case "Exit":
+          runTracker();
           break;
       }
     });
 }
+
+function updateRunTracker() {
+  inquirer
+    .prompt({
+      name: "action",
+      type: "rawlist",
+      message: "What would you like to do?",
+      choices: ["Update employee role", "Update employee manager", "Exit"],
+    })
+    .then(function (answer) {
+      switch (answer.action) {
+        case "Update employee role":
+          updateEmployees();
+          break;
+        case "Update employee manager":
+          updateManager();
+          break;
+
+        case "Exit":
+          runTracker();
+          break;
+      }
+    });
+}
+
+function deleteRunTracker() {
+  inquirer
+    .prompt({
+      name: "action",
+      type: "rawlist",
+      message: "What would you like to do?",
+      choices: ["Delete department", "Delete role", "Delete employee", "Exit"],
+    })
+    .then(function (answer) {
+      switch (answer.action) {
+        case "Delete employee":
+          deleteEmployees();
+          break;
+        case "Delete role":
+          deleteRoles();
+          break;
+        case "Delete department":
+          deleteDepartment();
+          break;
+
+        case "Exit":
+          runTracker();
+          break;
+      }
+    });
+}
+
 function addDepartment() {
   inquirer
     .prompt([
@@ -207,12 +311,27 @@ function viewRoles() {
 }
 function viewEmployees() {
   console.log("Selecting all employee...\n");
-  connection.query("SELECT employee.id, employee.first_name, employee.last_name, department.department_name, role.title, role.salary, employee.manager_id FROM employee INNER JOIN role ON role.id = employee.role_id INNER JOIN department ON department.id = role.department_id ORDER BY employee.last_name", function (err, res) {
-    if (err) throw err;
-    // Log all results of the SELECT statement
-    console.table(res);
-    runTracker();
-  });
+  connection.query(
+    "SELECT employee.id, employee.first_name, employee.last_name, department.department_name, role.title, role.salary, employee.manager_id FROM employee INNER JOIN role ON role.id = employee.role_id INNER JOIN department ON department.id = role.department_id ORDER BY employee.last_name",
+    function (err, res) {
+      if (err) throw err;
+      // Log all results of the SELECT statement
+      console.table(res);
+      runTracker();
+    }
+  );
+}
+function viewEmployeesManager() {
+  console.log("Selecting all employee...\n");
+  connection.query(
+    "SELECT employee.id, employee.first_name, employee.last_name, department.department_name, role.title, role.salary, employee.manager_id FROM employee INNER JOIN role ON role.id = employee.role_id INNER JOIN department ON department.id = role.department_id ORDER BY employee.manager_id",
+    function (err, res) {
+      if (err) throw err;
+      // Log all results of the SELECT statement
+      console.table(res);
+      runTracker();
+    }
+  );
 }
 function updateEmployees() {
   console.log("Updating employee role...\n");
@@ -242,13 +361,120 @@ function updateEmployees() {
         ],
         function (err, res) {
           if (err) throw err;
-          console.log(res.affectedRows + " products updated!\n");
+          console.log(res.affectedRows + " employee updated!\n");
           // Call deleteProduct AFTER the UPDATE completes
           runTracker();
         }
       );
-
-      // logs the actual query being run
       console.log(query.sql);
+    });
+}
+
+function updateManager() {
+  console.log("Updating employee manager...\n");
+  inquirer
+    .prompt([
+      {
+        name: "id",
+        type: "input",
+        message: "Please enter the employee id you would like to update:",
+      },
+      {
+        name: "manager_id",
+        type: "input",
+        message: "Please enter new manager id:",
+      },
+    ])
+    .then(function (answer) {
+      var query = connection.query(
+        "UPDATE employee SET ? WHERE ?",
+        [
+          {
+            manager_id: answer.manager_id,
+          },
+          {
+            id: answer.id,
+          },
+        ],
+        function (err, res) {
+          if (err) throw err;
+          console.log(res.affectedRows + " employee updated!\n");
+          // Call deleteProduct AFTER the UPDATE completes
+          runTracker();
+        }
+      );
+      console.log(query.sql);
+    });
+}
+function deleteDepartment() {
+  console.log("Deleting department...\n");
+  inquirer
+    .prompt([
+      {
+        name: "id",
+        type: "input",
+        message: "Please enter the department id you would like to delete:",
+      },
+    ])
+    .then(function (answer) {
+      connection.query(
+        "DELETE FROM department WHERE ?",
+        {
+          id: answer.id,
+        },
+        function (err, res) {
+          if (err) throw err;
+          console.log(res.affectedRows + " department deleted!\n");
+          runTracker();
+        }
+      );
+    });
+}
+function deleteRoles() {
+  console.log("Deleting role...\n");
+  inquirer
+    .prompt([
+      {
+        name: "id",
+        type: "input",
+        message: "Please enter the role id you would like to delete:",
+      },
+    ])
+    .then(function (answer) {
+      connection.query(
+        "DELETE FROM role WHERE ?",
+        {
+          id: answer.id,
+        },
+        function (err, res) {
+          if (err) throw err;
+          console.log(res.affectedRows + " role deleted!\n");
+          runTracker();
+        }
+      );
+    });
+}
+function deleteEmployees() {
+  console.log("Deleting employee...\n");
+  inquirer
+    .prompt([
+      {
+        name: "id",
+        type: "input",
+        message: "Please enter the employee id you would like to delete:",
+      },
+    ])
+    .then(function (answer) {
+      connection.query(
+        "DELETE FROM employee WHERE ?",
+        {
+          id: answer.id,
+        },
+        function (err, res) {
+          if (err) throw err;
+          console.log(res.affectedRows + " employee deleted!\n");
+          runTracker();
+        }
+      );
     });
 }
