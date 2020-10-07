@@ -27,6 +27,10 @@ CREATE TABLE employee(
     PRIMARY KEY (id)
 
 )
+SELECT employee.id, employee.first_name, employee.last_name, employee.manager_id, department.department_name, role.title, role.salary 
+FROM employee 
+INNER JOIN role ON role.id = employee.role_id 
+INNER JOIN department ON department.id = role.department_id
 
 select * from department;
 
