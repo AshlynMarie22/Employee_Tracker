@@ -57,15 +57,22 @@ Website URL: There is no URL for this application.
 
 Preview of the prompts:
 
-![screenshot](https://ashlynimages.s3.us-east-2.amazonaws.com/Screen+Shot+2020-10-01+at+1.07.57+AM.png)
+![screenshot](https://ashlynimages.s3.us-east-2.amazonaws.com/Screen+Shot+2020-10-07+at+3.56.08+AM.png)
 
 ## How to Use:
 1. Open the terminal and make sure you are inside the Develop folder.  
-2. Enter: ‘node app.js’ 
-3. Hit enter  
-4. Answer all of the prompts.   
-5. Open the team.html file in the Output folder to view the generated team cards. 
-
+2. Enter: ‘node server.js’ 
+3. Hit enter 
+4. Select your action:
+    ![screenshot](https://ashlynimages.s3.us-east-2.amazonaws.com/Screen+Shot+2020-10-07+at+3.57.27+AM.png)
+5. To add:
+    ![screenshot](https://ashlynimages.s3.us-east-2.amazonaws.com/Screen+Shot+2020-10-07+at+3.57.30+AM.png)
+6. To view:
+    ![screenshot](https://ashlynimages.s3.us-east-2.amazonaws.com/Screen+Shot+2020-10-07+at+3.57.34+AM.png)
+7. To Update:
+    ![screenshot](https://ashlynimages.s3.us-east-2.amazonaws.com/Screen+Shot+2020-10-07+at+3.57.40+AM.png)
+8. To delete:
+    ![screenshot](https://ashlynimages.s3.us-east-2.amazonaws.com/Screen+Shot+2020-10-07+at+3.57.46+AM.png)
 
 ---
 
